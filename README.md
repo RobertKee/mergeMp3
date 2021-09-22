@@ -14,9 +14,6 @@ to run:
   
 merge-mp3
 
-all arguments are optional
---single-file boolean, default true
-this merges the files in the directory the script is run in. if false, it will create files of each disc (assuming per-disc subdirectories) or nothing (no files outside pwd)
-
---file-extension, default "mp3"
-sets the type of file to be merged, only supports audio file extensions supported by ffmpeg
+optional argument 
+--disc-files
+will create single files of each disc or directory instead of a single file for the whole folder
