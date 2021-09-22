@@ -3,12 +3,16 @@ This script creates long concatenated mp3s from numerous short files. It is inte
 It wraps the ffmpeg concatenate shell command in nicer python handling. Run it from the directory that contains the files or folder you want to merge.
 
 to install:
+
 python -m build
+
 cd dist
+
 pip install <wheel file>
 
 to run:
-mergeMp3
+  
+merge-mp3
 
 all arguments are optional
 --single-file boolean, default true
