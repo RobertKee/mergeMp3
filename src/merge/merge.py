@@ -5,7 +5,7 @@ import sys
 from mutagen.id3 import ID3
 import argparse
 import pathlib
-# import glob
+import glob
 
 def merge_mp3(**kwargs):
 
@@ -30,18 +30,16 @@ def merge_mp3(**kwargs):
 
     # gets file extension
     extensions = dict()
-    for files in os.walk(os.getcwd()):
+    for subdir, dirs, files in os.walk(baseDirectory):
         for file in files:
-            print("checking file", file)
-            tempext = pathlib.Path(file).suffix
+            tempext = os.path.splitext(file)[1]
             if tempext not in extensions:
                 extensions[tempext] = 1
             else:
                 extensions[tempext] = extensions[tempext]+1
-    
+    print("extensions found:", extensions)
     ext = max(extensions, key=extensions.get)
     print("file extension set to", ext)
-
 
     # for processing disc folders
     for subdir in sorted(os.listdir(baseDirectory)):
@@ -51,29 +49,25 @@ def merge_mp3(**kwargs):
 
     if singleFile:
         runCommand(baseDirectory)
+        for file in glob.glob(f"Disc*{ext}"):
+            filecount-=1
+            os.remove(file)
+
     
     print(f"created {filecount} files")
-
-def getOutputName(directory):
-    if os.listdir(directory)[0].endswith(dotmp3):
-        audio = ID3(os.listdir(directory)[0])
-        if (str(audio.get('artist')) != "None") and (str(audio.get('album')) != "None"):
-            outputName = str(audio.get('artist')) + " - " + str(audio.get('album')) + dotmp3            
-    else:
-        outputName = os.path.basename(directory) + ext
-        
-    print("output file name", outputName)
-    return outputName
 
 def runCommand(directory):
 
     count = 0
     global filecount
+    samplefile = ""
 
     with open("filelist.txt", "w") as fileList:
         for filename in sorted(os.listdir(directory)):
             if not (filename.startswith('.')) and (filename.lower().endswith(ext)):
                 relativePath = os.path.join(directory,filename)
+                if not samplefile:
+                    samplefile = relativePath
                 print("adding", relativePath)
                 print(f"file '{relativePath}'", file=fileList)
                 count += 1
@@ -81,29 +75,13 @@ def runCommand(directory):
     print("files to process", count)
     
     if count > 0:
-        print("creating single file")
         arg = f"-f concat -safe 0 -i filelist.txt -acodec copy output{ext}"
         subprocess.check_call("ffmpeg %s" % arg, shell=True)
         filecount+=1
-        finaloutput = f"{baseDirectory}/{getOutputName(directory)}"
-        os.rename(f"output{ext}", finaloutput)
-        os.remove("fileList.txt")
-
-        if finaloutput.endswith(dotmp3):
-            # targetPattern = f"{baseDirectory}/**/*{dotmp3}"
-            audio = pathlib.Path(baseDirectory).glob(dotmp3)[0]
-            tag = ID3(finaloutput)
-            tag.add_tags()
-            tag['artist'] = audio.get('artist')
-            tag['title'] = audio.get('title')
-            tag['date'] = audio.get('date')
-            tag['album'] = audio.get('album')
-            tag['albumartist'] = audio.get('albumartist')
-            tag['tracknumber'] = 1
-            tag['discnumber'] = filecount
-            tag.save(v2_version=3)
-            
-            
-
+        outputName = os.path.basename(directory) + ext
+        finaloutput = f"{baseDirectory}/{outputName}"
+        print("final output name", finaloutput)
+        os.rename(f"output{ext}", finaloutput)        
+        os.remove("filelist.txt")
 
 # ffmpeg -f concat -safe 0 -i filelist.txt -acodec copy output.m4b
