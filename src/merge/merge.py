@@ -1,10 +1,6 @@
-from os import extsep
 import os.path 
 import subprocess
-import sys
-from mutagen.id3 import ID3
 import argparse
-import pathlib
 import glob
 
 def merge_mp3(**kwargs):
