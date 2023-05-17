@@ -19,7 +19,7 @@ setup(
     package_dir={'': 'src'}, 
     packages=find_packages(where='src'), 
     python_requires='>=3.6, <4',
-    install_requires=['peppercorn','mutagen','Path'],
+    install_requires=['peppercorn','mutagen','Path','natsort'],
     entry_points={  
         'console_scripts': [
             'merge-mp3=merge.merge:merge_mp3',

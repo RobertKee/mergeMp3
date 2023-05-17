@@ -2,6 +2,7 @@ import os.path
 import subprocess
 import argparse
 import glob
+from natsort import natsorted
 
 def merge_mp3(**kwargs):
 
@@ -38,7 +39,7 @@ def merge_mp3(**kwargs):
     print("file extension set to", ext)
 
     # for processing disc folders
-    for subdir in sorted(os.listdir(baseDirectory)):
+    for subdir in natsorted(os.listdir(baseDirectory)):
         if not subdir.startswith('.') and (os.path.isdir(subdir)):
             print("adding files from folder", subdir)       
             runCommand(subdir)
